@@ -38,6 +38,7 @@ body {
     position: relative;
 }
 
+
 .budget {
     position: absolute;
     width: 50%;
@@ -133,6 +134,19 @@ body {
     margin-right: 10px;
     font-weight: 300;
     transition: border 0.3s;
+    animation: border-color 2s ease-in-out infinite alternate;
+}
+
+@keyframes border-color {
+    0%{
+        border-color: #fc5688;
+    }
+    50%{
+        border-color: #ee0e98;
+    }
+    100%{
+        border-color: #f1f1f1;
+    }
 }
 
 .add__description,
@@ -154,7 +168,7 @@ body {
 .add__btn {
     font-size: 35px;
     background: none;
-    border: none;
+    border: 1px;
     color: hsl(342, 100%, 74%);
     cursor: pointer;
     display: inline-block;
@@ -162,7 +176,6 @@ body {
     line-height: 1.1;
     margin-left: 10px;
 }
-
 .add__btn:active { transform: translateY(2px); }
 
 .add__type:focus,
