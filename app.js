@@ -5,7 +5,9 @@ var uiController = (function(){
         inputType: ".add__type",
         inputDescription: ".add__description",
         inputValue: ".add__value",
-        inputAddBtn: ".add__btn"
+        inputAddBtn: ".add__btn",
+        incomeList: ".income__list",
+        ExpenceList: ".expenses__list"
     };
 
     return {
@@ -13,8 +15,7 @@ var uiController = (function(){
             return {
                 type: document.querySelector(DOMstring.inputType).value,
                 description: document.querySelector(DOMstring.inputDescription).value,
-                value: document.querySelector(DOMstring.inputValue).value,
-               
+                value: parseInt (document.querySelector(DOMstring.inputValue).value,)               
             };
         },
 
@@ -26,23 +27,45 @@ var uiController = (function(){
             var html, list;
             if(type === 'inc'){
                 html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%Description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"> <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
-                list = '.income__list';
+                list = DOMstring.incomeList;
             }
             else {
                 html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%Description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div>';
-                list = '.expenses__list';
+                list = DOMstring.ExpenceList;
                 }
             html = html.replace('%id%', item.id);
             html = html.replace('%Description%', item.description);
             html = html.replace('%value%', item.value);
 
             document.querySelector(list).insertAdjacentHTML("beforeend", html);
-        }
+        },
+
+        clearFields: function(){
+            var fields = document.querySelectorAll(
+                DOMstring.inputDescription + ',' + DOMstring.inputValue
+            );
+
+            var fieldsArr = Array.prototype.slice.call(fields);
+
+            fieldsArr.forEach(function(el){
+                el.value = "";
+            });
+
+            fieldsArr[0].focus();
+        },
     };
 
 })();
 // Санхүүтэй ажиллах
 var financeController = (function(){
+
+    var calculationTotal = function(type) {
+        var sum = 0;
+        data.items[type].forEach(function(el){
+            sum = sum + el.value;
+        });
+        data.totals[type] = sum;
+    };
 
     var Income = function(id, description, value){
         this.id = id,
@@ -61,12 +84,33 @@ var financeController = (function(){
             inc: [],
             exp: []
         },
+
         totals: {
             inc: 0,
             exp: 0
-        }
+        },
+
+        tusuv: 0,
+
+        huvi: 0
     }
     return {
+        tusuvTootsooloh: function(){
+            calculationTotal("inc");
+            calculationTotal("exp");
+
+             data.tusuv = data.totals.inc -  data.totals.exp;
+
+             data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+        },
+        tusviigAvah: function(){
+            return {
+                tusuv: data.tusuv,
+                huvi: data.huvi,
+                totalInc: data.totals.inc,
+                totalExp: data.totals.exp
+            }
+        },
         addItem: function(type, desc, val){
             var item, id;
 
@@ -93,10 +137,24 @@ var appController = (function(uiCtrl, fnCtrl){
     var ctrlAddItem = function(){
         var input = uiController.getInput();
     
-    var item = financeController.addItem(input.type, input.description, input.value);
+    if (input.description !== "" && input.value !== ""){
 
-    uiController.addListItem(item, input.type);
-        
+        var item = financeController.addItem(
+            input.type, 
+            input.description, 
+            input.value);
+    
+        uiController.addListItem(item, input.type);
+
+        uiController.clearFields();
+
+        financeController.tusuvTootsooloh();
+
+        var tusuv = financeController.tusviigAvah();
+
+        console.log(tusuv);
+
+    }   
     };
 var setupEventListeners = function (){
     var DOM = uiController.getDOMstring();
@@ -106,7 +164,7 @@ var setupEventListeners = function (){
     });
 
     document.addEventListener('keypress' , function(event){
-        if(event.Keycode === 13 |  UIEvent.which === 13) {
+        if(event.Keycode === 13 |  event.which === 13) {
             ctrlAddItem();
         }
     });
