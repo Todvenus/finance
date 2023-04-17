@@ -7,7 +7,11 @@ var uiController = (function(){
         inputValue: ".add__value",
         inputAddBtn: ".add__btn",
         incomeList: ".income__list",
-        ExpenceList: ".expenses__list"
+        expenceList: ".expenses__list",
+        budgetLabel: ".budget__value",
+        incomeLabel: ".budget__income--value",
+        expenseLabel: ".budget__expenses--value",
+        percentageLabel: ".budget__expenses--percentage"
     };
 
     return {
@@ -31,7 +35,7 @@ var uiController = (function(){
             }
             else {
                 html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%Description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div>';
-                list = DOMstring.ExpenceList;
+                list = DOMstring.expenceList;
                 }
             html = html.replace('%id%', item.id);
             html = html.replace('%Description%', item.description);
@@ -53,6 +57,13 @@ var uiController = (function(){
 
             fieldsArr[0].focus();
         },
+
+        tusuviigUzuuleh: function(niitTusuv) {
+            document.querySelector(DOMstring.budgetLabel).textContent = niitTusuv.tusuv + " ₮";
+            document.querySelector(DOMstring.incomeLabel).textContent = niitTusuv.totalInc + " ₮";
+            document.querySelector(DOMstring.expenseLabel).textContent = niitTusuv.totalExp + " ₮";
+            document.querySelector(DOMstring.percentageLabel).textContent = niitTusuv.huvi + '%';
+        }
     };
 
 })();
@@ -152,7 +163,8 @@ var appController = (function(uiCtrl, fnCtrl){
 
         var tusuv = financeController.tusviigAvah();
 
-        console.log(tusuv);
+        uiController.tusuviigUzuuleh(tusuv);
+
 
     }   
     };
@@ -172,6 +184,12 @@ var setupEventListeners = function (){
 
 return {
     init: function() {
+        uiController.tusuviigUzuuleh({
+            tusuv: 0,
+            huvi: 0,
+            totalInc: 0,
+            totalExp: 0
+        });
         setupEventListeners();
     }
 };
