@@ -13,13 +13,30 @@ var uiController = (function(){
             return {
                 type: document.querySelector(DOMstring.inputType).value,
                 description: document.querySelector(DOMstring.inputDescription).value,
-                vale: document.querySelector(DOMstring.inputValue).value,
+                value: document.querySelector(DOMstring.inputValue).value,
                
             };
         },
 
         getDOMstring:  function(){
             return DOMstring;
+        },
+
+        addListItem:  function(item, type) {
+            var html, list;
+            if(type === 'inc'){
+                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%Description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"> <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                list = '.income__list';
+            }
+            else {
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%Description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div>';
+                list = '.expenses__list';
+                }
+            html = html.replace('%id%', item.id);
+            html = html.replace('%Description%', item.description);
+            html = html.replace('%value%', item.value);
+
+            document.querySelector(list).insertAdjacentHTML("beforeend", html);
         }
     };
 
@@ -40,7 +57,7 @@ var financeController = (function(){
     };
     
     var data = {
-        allItems: {
+        items: {
             inc: [],
             exp: []
         },
@@ -49,15 +66,38 @@ var financeController = (function(){
             exp: 0
         }
     }
+    return {
+        addItem: function(type, desc, val){
+            var item, id;
+
+            if(data.items[type].length === 0) id = 1;
+            else {
+               id = data.items[type] [data.items[type].length -1 ].id + 1;
+            };
+
+            if(type === 'inc'){
+                item = new Income (id, desc, val);
+            }
+            else {
+                item = new Expence (id, desc, val);
+                }
+            data.items[type].push(item);
+
+            return item;
+        },
+    };
 
 })();
 // Програмын холбогч
 var appController = (function(uiCtrl, fnCtrl){
     var ctrlAddItem = function(){
-        console.log(uiController.getInput());
+        var input = uiController.getInput();
+    
+    var item = financeController.addItem(input.type, input.description, input.value);
 
+    uiController.addListItem(item, input.type);
+        
     };
-
 var setupEventListeners = function (){
     var DOM = uiController.getDOMstring();
 
@@ -74,7 +114,6 @@ var setupEventListeners = function (){
 
 return {
     init: function() {
-        console.log('Starting...');
         setupEventListeners();
     }
 };
